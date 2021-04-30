@@ -1,24 +1,66 @@
+/**
+ * Tencent is pleased to support the open source community by making QMUI_iOS available.
+ * Copyright (C) 2016-2021 THL A29 Limited, a Tencent company. All rights reserved.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+ * http://opensource.org/licenses/MIT
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
 //
 //  UICollectionView+QMUI.m
 //  qmui
 //
-//  Created by ZhoonChen on 15/7/20.
-//  Copyright (c) 2015年 QMUI Team. All rights reserved.
+//  Created by QMUI Team on 15/7/20.
 //
 
 #import "UICollectionView+QMUI.h"
-#import <objc/runtime.h>
+#import "QMUICore.h"
+#import "QMUILog.h"
 
 @implementation UICollectionView (QMUI)
 
-- (void)clearsSelection {
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        
+        // 防止 release 版本滚动到不合法的 indexPath 会 crash
+        OverrideImplementation([UICollectionView class], @selector(scrollToItemAtIndexPath:atScrollPosition:animated:), ^id(__unsafe_unretained Class originClass, SEL originCMD, IMP (^originalIMPProvider)(void)) {
+            return ^(UICollectionView *selfObject, NSIndexPath *indexPath, UICollectionViewScrollPosition scrollPosition, BOOL animated) {
+                BOOL isIndexPathLegal = YES;
+                NSInteger numberOfSections = [selfObject numberOfSections];
+                if (indexPath.section >= numberOfSections) {
+                    isIndexPathLegal = NO;
+                } else {
+                    NSInteger items = [selfObject numberOfItemsInSection:indexPath.section];
+                    if (indexPath.item >= items) {
+                        isIndexPathLegal = NO;
+                    }
+                }
+                if (!isIndexPathLegal) {
+                    QMUILogWarn(@"UICollectionView (QMUI)", @"%@ - target indexPath : %@ ，不合法的indexPath。\n%@", selfObject, indexPath, [NSThread callStackSymbols]);
+                    if (QMUICMIActivated && !ShouldPrintQMUIWarnLogToConsole) {
+                        NSAssert(NO, @"出现不合法的indexPath");
+                    }
+                    return;
+                }
+                
+                // call super
+                void (*originSelectorIMP)(id, SEL, NSIndexPath *, UICollectionViewScrollPosition, BOOL);
+                originSelectorIMP = (void (*)(id, SEL, NSIndexPath *, UICollectionViewScrollPosition, BOOL))originalIMPProvider();
+                originSelectorIMP(selfObject, originCMD, indexPath, scrollPosition, animated);
+            };
+        });
+    });
+}
+
+- (void)qmui_clearsSelection {
     NSArray *selectedItemIndexPaths = [self indexPathsForSelectedItems];
     for (NSIndexPath *indexPath in selectedItemIndexPaths) {
         [self deselectItemAtIndexPath:indexPath animated:YES];
     }
 }
 
-- (void)reloadDataKeepingSelection {
+- (void)qmui_reloadDataKeepingSelection {
     NSArray *selectedIndexPaths = [self indexPathsForSelectedItems];
     [self reloadData];
     for (NSIndexPath *indexPath in selectedIndexPaths) {
@@ -39,7 +81,7 @@
     return [self parentCellForView:view.superview];
 }
 
-- (NSIndexPath *)indexPathForItemAtView:(id)sender {
+- (NSIndexPath *)qmui_indexPathForItemAtView:(id)sender {
     if (sender && [sender isKindOfClass:[UIView class]]) {
         UIView *view = (UIView *)sender;
         UICollectionViewCell *parentCell = [self parentCellForView:view];
@@ -51,7 +93,7 @@
     return nil;
 }
 
-- (BOOL)itemVisibleAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)qmui_itemVisibleAtIndexPath:(NSIndexPath *)indexPath {
     NSArray *visibleItemIndexPaths = self.indexPathsForVisibleItems;
     for (NSIndexPath *visibleIndexPath in visibleItemIndexPaths) {
         if ([indexPath isEqual:visibleIndexPath]) {
@@ -61,277 +103,21 @@
     return NO;
 }
 
-- (NSIndexPath *)indexPathForFirstVisibleCell {
-    NSArray *visibleIndexPaths = [self indexPathsForVisibleItems];
+- (NSArray<NSIndexPath *> *)qmui_indexPathsForVisibleItems {
+    NSArray<NSIndexPath *> *visibleItems = [self indexPathsForVisibleItems];
+    NSSortDescriptor *sectionSorter = [[NSSortDescriptor alloc] initWithKey:@"section" ascending:YES];
+    NSSortDescriptor *rowSorter = [[NSSortDescriptor alloc] initWithKey:@"item" ascending:YES];
+    visibleItems = [visibleItems sortedArrayUsingDescriptors:[NSArray arrayWithObjects:sectionSorter, rowSorter, nil]];
+    return visibleItems;
+}
+
+- (NSIndexPath *)qmui_indexPathForFirstVisibleCell {
+    NSArray *visibleIndexPaths = [self qmui_indexPathsForVisibleItems];
     if (!visibleIndexPaths || visibleIndexPaths.count <= 0) {
         return nil;
     }
-    NSIndexPath *minimumIndexPath = nil;
-    for (NSIndexPath *indexPath in visibleIndexPaths) {
-        if (!minimumIndexPath) {
-            minimumIndexPath = indexPath;
-            continue;
-        }
-        
-        if (indexPath.section < minimumIndexPath.section) {
-            minimumIndexPath = indexPath;
-            continue;
-        }
-        
-        if (indexPath.item < minimumIndexPath.item) {
-            minimumIndexPath = indexPath;
-            continue;
-        }
-    }
-    return minimumIndexPath;
-}
-
-@end
-
-/// ====================== 计算动态cell高度相关 =======================
-
-@implementation UICollectionView (QMUIKeyedHeightCache)
-
-- (QMUICellHeightKeyCache *)keyedHeightCache {
-    QMUICellHeightKeyCache *cache = objc_getAssociatedObject(self, _cmd);
-    if (!cache) {
-        cache = [[QMUICellHeightKeyCache alloc] init];
-        objc_setAssociatedObject(self, _cmd, cache, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return cache;
-}
-
-@end
-
-@implementation UICollectionView (QMUICellHeightIndexPathCache)
-
-- (QMUICellHeightIndexPathCache *)indexPathHeightCache {
-    QMUICellHeightIndexPathCache *cache = objc_getAssociatedObject(self, _cmd);
-    if (!cache) {
-        cache = [[QMUICellHeightIndexPathCache alloc] init];
-        objc_setAssociatedObject(self, _cmd, cache, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    return cache;
-}
-
-@end
-
-@implementation UICollectionView (QMUIIndexPathHeightCacheInvalidation)
-
-- (void)reloadDataWithoutInvalidateIndexPathHeightCache {
-    [self qmui_reloadData];
-}
-
-+ (void)load {
-    SEL selectors[] = {
-        @selector(reloadData),
-        @selector(insertSections:),
-        @selector(deleteSections:),
-        @selector(reloadSections:),
-        @selector(moveSection:toSection:),
-        @selector(insertItemsAtIndexPaths:),
-        @selector(deleteItemsAtIndexPaths:),
-        @selector(reloadItemsAtIndexPaths:),
-        @selector(moveItemAtIndexPath:toIndexPath:)
-    };
-    for (NSUInteger index = 0; index < sizeof(selectors) / sizeof(SEL); ++index) {
-        SEL originalSelector = selectors[index];
-        SEL swizzledSelector = NSSelectorFromString([@"qmui_" stringByAppendingString:NSStringFromSelector(originalSelector)]);
-        Method originalMethod = class_getInstanceMethod(self, originalSelector);
-        Method swizzledMethod = class_getInstanceMethod(self, swizzledSelector);
-        method_exchangeImplementations(originalMethod, swizzledMethod);
-    }
-}
-
-- (void)qmui_reloadData {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-            [heightsBySection removeAllObjects];
-        }];
-    }
-    [self qmui_reloadData];
-}
-
-- (void)qmui_insertSections:(NSIndexSet *)sections {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL *stop) {
-            [self.indexPathHeightCache buildSectionsIfNeeded:section];
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                [heightsBySection insertObject:[NSMutableArray array] atIndex:section];
-            }];
-        }];
-    }
-    [self qmui_insertSections:sections];
-}
-
-- (void)qmui_deleteSections:(NSIndexSet *)sections {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [sections enumerateIndexesUsingBlock:^(NSUInteger section, BOOL *stop) {
-            [self.indexPathHeightCache buildSectionsIfNeeded:section];
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                [heightsBySection removeObjectAtIndex:section];
-            }];
-        }];
-    }
-    [self qmui_deleteSections:sections];
-}
-
-- (void)qmui_reloadSections:(NSIndexSet *)sections {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [sections enumerateIndexesUsingBlock: ^(NSUInteger section, BOOL *stop) {
-            [self.indexPathHeightCache buildSectionsIfNeeded:section];
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                [heightsBySection[section] removeAllObjects];
-            }];
-        }];
-    }
-    [self qmui_reloadSections:sections];
-}
-
-- (void)qmui_moveSection:(NSInteger)section toSection:(NSInteger)newSection {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache buildSectionsIfNeeded:section];
-        [self.indexPathHeightCache buildSectionsIfNeeded:newSection];
-        [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-            [heightsBySection exchangeObjectAtIndex:section withObjectAtIndex:newSection];
-        }];
-    }
-    [self qmui_moveSection:section toSection:newSection];
-}
-
-- (void)qmui_insertItemsAtIndexPaths:(NSArray *)indexPaths {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache buildCachesAtIndexPathsIfNeeded:indexPaths];
-        [indexPaths enumerateObjectsUsingBlock:^(NSIndexPath *indexPath, NSUInteger idx, BOOL *stop) {
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                NSMutableArray *rows = heightsBySection[indexPath.section];
-                [rows insertObject:@(-1) atIndex:indexPath.item];
-            }];
-        }];
-    }
-    [self qmui_insertItemsAtIndexPaths:indexPaths];
-}
-
-- (void)qmui_deleteItemsAtIndexPaths:(NSArray *)indexPaths {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache buildCachesAtIndexPathsIfNeeded:indexPaths];
-        NSMutableDictionary *mutableIndexSetsToRemove = [NSMutableDictionary dictionary];
-        [indexPaths enumerateObjectsUsingBlock:^(NSIndexPath *indexPath, NSUInteger idx, BOOL *stop) {
-            NSMutableIndexSet *mutableIndexSet = mutableIndexSetsToRemove[@(indexPath.section)];
-            if (!mutableIndexSet) {
-                mutableIndexSet = [NSMutableIndexSet indexSet];
-                mutableIndexSetsToRemove[@(indexPath.section)] = mutableIndexSet;
-            }
-            [mutableIndexSet addIndex:indexPath.item];
-        }];
-        [mutableIndexSetsToRemove enumerateKeysAndObjectsUsingBlock:^(NSNumber *key, NSIndexSet *indexSet, BOOL *stop) {
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                NSMutableArray *rows = heightsBySection[key.integerValue];
-                [rows removeObjectsAtIndexes:indexSet];
-            }];
-        }];
-    }
-    [self qmui_deleteItemsAtIndexPaths:indexPaths];
-}
-
-- (void)qmui_reloadItemsAtIndexPaths:(NSArray *)indexPaths {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache buildCachesAtIndexPathsIfNeeded:indexPaths];
-        [indexPaths enumerateObjectsUsingBlock:^(NSIndexPath *indexPath, NSUInteger idx, BOOL *stop) {
-            [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-                NSMutableArray *rows = heightsBySection[indexPath.section];
-                rows[indexPath.item] = @(-1);
-            }];
-        }];
-    }
-    [self qmui_reloadItemsAtIndexPaths:indexPaths];
-}
-
-- (void)qmui_moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    if (self.indexPathHeightCache.automaticallyInvalidateEnabled) {
-        [self.indexPathHeightCache buildCachesAtIndexPathsIfNeeded:@[sourceIndexPath, destinationIndexPath]];
-        [self.indexPathHeightCache enumerateAllOrientationsUsingBlock:^(NSMutableArray *heightsBySection) {
-            NSMutableArray *sourceRows = heightsBySection[sourceIndexPath.section];
-            NSMutableArray *destinationRows = heightsBySection[destinationIndexPath.section];
-            NSNumber *sourceValue = sourceRows[sourceIndexPath.item];
-            NSNumber *destinationValue = destinationRows[destinationIndexPath.item];
-            sourceRows[sourceIndexPath.item] = destinationValue;
-            destinationRows[destinationIndexPath.item] = sourceValue;
-        }];
-    }
-    [self qmui_moveItemAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
-}
-
-@end
-
-@implementation UICollectionView (QMUILayoutCell)
-
-- (UICollectionViewCell *)templateCellForReuseIdentifier:(NSString *)identifier cellClass:(Class)cellClass {
-    NSAssert(identifier.length > 0, @"Expect a valid identifier - %@", identifier);
-    NSAssert([self.collectionViewLayout isKindOfClass:[UICollectionViewFlowLayout class]], @"only flow layout accept");
-    NSAssert([cellClass isSubclassOfClass:[UICollectionViewCell class]], @"must be uicollection view cell");
-    NSMutableDictionary *templateCellsByIdentifiers = objc_getAssociatedObject(self, _cmd);
-    if (!templateCellsByIdentifiers) {
-        templateCellsByIdentifiers = @{}.mutableCopy;
-        objc_setAssociatedObject(self, _cmd, templateCellsByIdentifiers, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    UICollectionViewCell *templateCell = templateCellsByIdentifiers[identifier];
-    if (!templateCell) {
-        // CollecionView 跟 TableView 不太一样，无法通过 dequeueReusableCellWithReuseIdentifier:forIndexPath: 来拿到cell（如果这样做，首先indexPath不知道传什么值，其次是这样做会已知crash，说数组越界），所以只能通过传一个class来通过init方法初始化一个cell，但是也有缓存来复用cell。
-        // templateCell = [self dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-        templateCell = [[cellClass alloc] initWithFrame:CGRectZero];
-        NSAssert(templateCell != nil, @"Cell must be registered to collection view for identifier - %@", identifier);
-    }
-    templateCell.contentView.translatesAutoresizingMaskIntoConstraints = NO;
-    templateCellsByIdentifiers[identifier] = templateCell;
-    NSLog(@"layout cell created - %@", identifier);
-    return templateCell;
-}
-
-- (CGFloat)heightForCellWithIdentifier:(NSString *)identifier cellClass:(Class)cellClass itemWidth:(CGFloat)itemWidth configuration:(void (^)(id cell))configuration {
-    if (!identifier || CGRectIsEmpty(self.bounds)) {
-        return 0;
-    }
-    UICollectionViewCell *cell = [self templateCellForReuseIdentifier:identifier cellClass:cellClass];
-    [cell prepareForReuse];
-    if (configuration) { configuration(cell); }
-    CGSize fitSize = CGSizeZero;
-    if (cell && itemWidth > 0) {
-        SEL selector = @selector(sizeThatFits:);
-        BOOL inherited = ![cell isMemberOfClass:[UICollectionViewCell class]];
-        BOOL overrided = [cell.class instanceMethodForSelector:selector] != [UICollectionViewCell instanceMethodForSelector:selector];
-        if (inherited && !overrided) {
-            NSAssert(NO, @"Customized cell must override '-sizeThatFits:' method if not using auto layout.");
-        }
-        fitSize = [cell sizeThatFits:CGSizeMake(itemWidth, CGFLOAT_MAX)];
-    }
-    return ceilf(fitSize.height);
-}
-
-// 通过indexPath缓存高度
-- (CGFloat)heightForCellWithIdentifier:(NSString *)identifier cellClass:(Class)cellClass itemWidth:(CGFloat)itemWidth cacheByIndexPath:(NSIndexPath *)indexPath configuration:(void (^)(id cell))configuration {
-    if (!identifier || !indexPath || CGRectIsEmpty(self.bounds)) {
-        return 0;
-    }
-    if ([self.indexPathHeightCache existsHeightAtIndexPath:indexPath]) {
-        return [self.indexPathHeightCache heightForIndexPath:indexPath];
-    }
-    CGFloat height = [self heightForCellWithIdentifier:identifier cellClass:cellClass itemWidth:itemWidth configuration:configuration];
-    [self.indexPathHeightCache cacheHeight:height byIndexPath:indexPath];
-    return height;
-}
-
-// 通过key缓存高度
-- (CGFloat)heightForCellWithIdentifier:(NSString *)identifier cellClass:(Class)cellClass itemWidth:(CGFloat)itemWidth cacheByKey:(id<NSCopying>)key configuration:(void (^)(id cell))configuration {
-    if (!identifier || !key || CGRectIsEmpty(self.bounds)) {
-        return 0;
-    }
-    if ([self.keyedHeightCache existsHeightForKey:key]) {
-        return [self.keyedHeightCache heightForKey:key];
-    }
-    CGFloat height = [self heightForCellWithIdentifier:identifier cellClass:cellClass itemWidth:itemWidth configuration:configuration];
-    [self.keyedHeightCache cacheHeight:height byKey:key];
-    return height;
+    
+    return visibleIndexPaths.firstObject;
 }
 
 @end
