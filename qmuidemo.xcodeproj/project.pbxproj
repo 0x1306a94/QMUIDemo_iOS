@@ -234,11 +234,9 @@
 		1679E32F1DFFC4610072B8A1 /* QDCustomToastContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QDCustomToastContentView.h; sourceTree = "<group>"; };
 		1679E3301DFFC4610072B8A1 /* QDCustomToastContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDCustomToastContentView.m; sourceTree = "<group>"; };
 		16F42C111B1C60A70038B28F /* image0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "image0@2x.png"; sourceTree = "<group>"; };
+		3C97760A263BB79700C9C43E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4CD323892109A55E007033C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4CD3238A2109A564007033C9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		4CD3238C2109A7AE007033C9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "zh-Hans"; path = "zh-Hans.lproj/Info.plist"; sourceTree = "<group>"; };
-		4CD3238E2109A810007033C9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Base; path = Base.lproj/Info.plist; sourceTree = "<group>"; };
-		4CD323902109A84D007033C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = en; path = en.lproj/Info.plist; sourceTree = "<group>"; };
 		4CD323982109B362007033C9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4CD3239A2109B364007033C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4CD3239B2109B366007033C9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -555,7 +553,7 @@
 		165F42F31ADB60180057EF6A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				4CD3238D2109A7AE007033C9 /* Info.plist */,
+				3C97760A263BB79700C9C43E /* Info.plist */,
 				165F42F51ADB60180057EF6A /* main.m */,
 				165F43DB1ADB74E90057EF6A /* PrefixHeader.pch */,
 			);
@@ -1319,16 +1317,6 @@
 				4CD3238A2109A564007033C9 /* zh-Hans */,
 			);
 			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-		4CD3238D2109A7AE007033C9 /* Info.plist */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4CD3238C2109A7AE007033C9 /* zh-Hans */,
-				4CD3238E2109A810007033C9 /* Base */,
-				4CD323902109A84D007033C9 /* en */,
-			);
-			name = Info.plist;
 			sourceTree = "<group>";
 		};
 		4CD323972109B362007033C9 /* Localizable.strings */ = {

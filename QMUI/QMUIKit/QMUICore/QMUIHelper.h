@@ -240,6 +240,11 @@ extern const CGPoint QMUIBadgeInvalidateOffset;
  * 恢复对App的主要window的置灰操作，与`dimmedApplicationWindow`成对调用
  */
 + (void)resetDimmedApplicationWindow;
+/**
+ * 获取当前主 Window, 兼容 iOS 13 的 Multiple Windows 特性
+ * 通过此方法拿到的 Window 一定是 所交互的的 主 Window
+ */
++ (__kindof UIWindow *)keyWindow;
 
 /**
  * 黑色的 StatusBarStyle，用于亮色背景

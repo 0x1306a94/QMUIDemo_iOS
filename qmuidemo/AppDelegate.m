@@ -19,7 +19,7 @@
 #import "QMUIConfigurationTemplatePinkRose.h"
 #import "QMUIConfigurationTemplateDark.h"
 
-//#define UIWindowScene_Enabled
+#define UIWindowScene_Enabled
 
 @implementation AppDelegate
 

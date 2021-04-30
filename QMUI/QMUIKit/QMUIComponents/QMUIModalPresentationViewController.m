@@ -20,6 +20,7 @@
 #import "QMUIKeyboardManager.h"
 #import "UIWindow+QMUI.h"
 #import "QMUIAppearance.h"
+#import "QMUIHelper.h"
 
 @interface UIViewController ()
 
@@ -268,10 +269,27 @@
         
         if (self.shownInWindowMode) {
             // 恢复 keyWindow 之前做一下检查，避免这个问题 https://github.com/Tencent/QMUI_iOS/issues/90
-            if (UIApplication.sharedApplication.keyWindow == self.containerWindow) {
+            __kindof UIWindow *keyWindow = [QMUIHelper keyWindow];
+            if (keyWindow == self.containerWindow) {
                 if (self.previousKeyWindow.hidden) {
                     // 保护了这个 issue 记录的情况，避免主 window 丢失 keyWindow https://github.com/Tencent/QMUI_iOS/issues/315
-                    [UIApplication.sharedApplication.delegate.window makeKeyWindow];
+                    if (@available(iOS 13.0, *)) {
+                        if (UIApplication.sharedApplication.supportsMultipleScenes) {
+                            for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+                                if ([scene isKindOfClass:UIWindowScene.class]) {
+                                    if (((UIWindowScene *)scene) == self.containerWindow.windowScene) {
+                                       id<UIWindowSceneDelegate> delegate= ((UIWindowSceneDelegate *)scene.delegate);
+                                        [delegate.window makeKeyAndVisible];
+                                    }
+                                }
+                            }
+                        } else {
+                            [UIApplication.sharedApplication.delegate.window makeKeyWindow];
+                        }
+                    } else {
+                        [UIApplication.sharedApplication.delegate.window makeKeyWindow];
+                    }
+                    
                 } else {
                     [self.previousKeyWindow makeKeyWindow];
                 }
@@ -481,13 +499,16 @@
     // makeKeyAndVisible 导致的 viewWillAppear: 必定 animated 是 NO 的，所以这里用额外的变量保存这个 animated 的值
     self.appearAnimated = animated;
     self.appearCompletionBlock = completion;
-    self.previousKeyWindow = UIApplication.sharedApplication.keyWindow;
+    self.previousKeyWindow = [QMUIHelper keyWindow];
     if (!self.containerWindow) {
         self.containerWindow = [[QMUIModalPresentationWindow alloc] init];
         self.containerWindow.windowLevel = UIWindowLevelQMUIAlertView;
         self.containerWindow.backgroundColor = UIColorClear;// 避免横竖屏旋转时出现黑色
         [self updateContainerWindowStatusBarCapture];
     }
+    if (@available(iOS 13.0, *)) {
+        self.containerWindow.windowScene = self.previousKeyWindow.windowScene;
+     }
     self.containerWindow.rootViewController = self;
     [self.containerWindow makeKeyAndVisible];
 }

@@ -17,6 +17,7 @@
 #import "QMUICore.h"
 #import "QMUILog.h"
 #import "QMUIAppearance.h"
+#import "QMUIHelper.h"
 
 @interface QMUIKeyboardManager ()
 
@@ -387,10 +388,11 @@ static char kAssociatedObjectKey_KeyboardViewFrameObserver;
 }
 
 - (UIResponder *)firstResponderInWindows {
-    UIResponder *responder = [UIApplication.sharedApplication.keyWindow qmui_findFirstResponder];
+    __kindof UIWindow *keyWindow = [QMUIHelper keyWindow];
+    UIResponder *responder = [keyWindow qmui_findFirstResponder];
     if (!responder) {
         for (UIWindow *window in UIApplication.sharedApplication.windows) {
-            if (window != UIApplication.sharedApplication.keyWindow) {
+            if (window != keyWindow) {
                 responder = [window qmui_findFirstResponder];
                 if (responder) {
                     return responder;
@@ -715,7 +717,7 @@ static char kAssociatedObjectKey_KeyboardViewFrameObserver;
         self.keyboardMoveBeginRect = endFrame;
         
         if (self.currentResponder) {
-            UIWindow *mainWindow = UIApplication.sharedApplication.keyWindow ?: UIApplication.sharedApplication.windows.firstObject;
+            UIWindow *mainWindow = [QMUIHelper keyWindow];
             if (mainWindow) {
                 CGRect keyboardRect = keyboardMoveUserInfo.endFrame;
                 CGFloat distanceFromBottom = [QMUIKeyboardManager distanceFromMinYToBottomInView:mainWindow keyboardRect:keyboardRect];
@@ -805,7 +807,7 @@ static char kAssociatedObjectKey_KeyboardViewFrameObserver;
         return rect;
     }
     
-    UIWindow *mainWindow = UIApplication.sharedApplication.keyWindow ?: UIApplication.sharedApplication.windows.firstObject;
+    UIWindow *mainWindow = [QMUIHelper keyWindow];
     if (!mainWindow) {
         if (view) {
             [view convertRect:rect fromView:nil];

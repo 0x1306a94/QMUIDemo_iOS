@@ -796,15 +796,25 @@ static NSInteger isHighPerformanceDevice = -1;
 @implementation QMUIHelper (UIApplication)
 
 + (void)dimmedApplicationWindow {
-    UIWindow *window = UIApplication.sharedApplication.delegate.window;
+    UIWindow *window = [self keyWindow];
     window.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
     [window tintColorDidChange];
 }
 
 + (void)resetDimmedApplicationWindow {
-    UIWindow *window = UIApplication.sharedApplication.delegate.window;
+    UIWindow *window = [self keyWindow];
     window.tintAdjustmentMode = UIViewTintAdjustmentModeNormal;
     [window tintColorDidChange];
+}
+
++ (__kindof UIWindow *)keyWindow {
+    NSArray<__kindof UIWindow *> *windows = UIApplication.sharedApplication.windows;
+    for (__kindof UIWindow *window in windows) {
+        if ([window isKeyWindow]) {
+            return window;
+        }
+    }
+    return nil;
 }
 
 + (UIStatusBarStyle)statusBarStyleDarkContent {
