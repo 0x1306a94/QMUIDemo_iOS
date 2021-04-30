@@ -134,8 +134,18 @@ static id (*directTraitCollectionIMP)(id, SEL) = NULL;
                         }
                         if (selfObject == firstValidatedWindow) {
                             if (qmui_lastNotifiedUserInterfaceStyle != traitCollection.userInterfaceStyle) {
-                                qmui_lastNotifiedUserInterfaceStyle = traitCollection.userInterfaceStyle;
-                                [self _qmui_notifyUserInterfaceStyleWillChangeEvents:traitCollection];
+                                BOOL needModifi = YES;
+                                if (@available(iOS 13.0, *)) {
+                                    if (UIApplication.sharedApplication.connectedScenes.count > 1 && ![selfObject isKeyWindow]) {
+                                        // 存在多个窗口, 并且当前窗口不是主窗口
+                                        // 这种情况需要过滤掉,否则会导致主题修改多次,最终恢复成默认主题
+                                        needModifi = NO;
+                                    }
+                                }
+                                if (needModifi) {
+                                    qmui_lastNotifiedUserInterfaceStyle = traitCollection.userInterfaceStyle;
+                                    [self _qmui_notifyUserInterfaceStyleWillChangeEvents:traitCollection];
+                                }
                             }
                         } else if (!firstValidatedWindow) {
                             // 没有 firstValidatedWindow 有以下方法来拿到当前的外观：

@@ -278,8 +278,7 @@
                             for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
                                 if ([scene isKindOfClass:UIWindowScene.class]) {
                                     if (((UIWindowScene *)scene) == self.containerWindow.windowScene) {
-                                       id<UIWindowSceneDelegate> delegate= ((UIWindowSceneDelegate *)scene.delegate);
-                                        [delegate.window makeKeyAndVisible];
+                                        [((id<UIWindowSceneDelegate>)scene.delegate).window makeKeyAndVisible];
                                     }
                                 }
                             }

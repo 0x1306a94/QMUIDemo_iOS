@@ -32,6 +32,12 @@
 		1679E32E1DFFC0AD0072B8A1 /* QDCustomToastAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 1679E32D1DFFC0AD0072B8A1 /* QDCustomToastAnimator.m */; };
 		1679E3311DFFC4610072B8A1 /* QDCustomToastContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1679E3301DFFC4610072B8A1 /* QDCustomToastContentView.m */; };
 		16F42C121B1C60A70038B28F /* image0@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 16F42C111B1C60A70038B28F /* image0@2x.png */; };
+		3C97764E263BCDAB00C9C43E /* QDIPhoneSceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C97764D263BCDAB00C9C43E /* QDIPhoneSceneDelegate.m */; };
+		3C977654263BCDC000C9C43E /* QDIPadSceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C977653263BCDC000C9C43E /* QDIPadSceneDelegate.m */; };
+		3C977659263BCE5A00C9C43E /* QDLaunchHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C977658263BCE5A00C9C43E /* QDLaunchHelper.m */; };
+		3C97765F263BD0FC00C9C43E /* QDIPadMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C97765D263BD0FC00C9C43E /* QDIPadMainViewController.m */; };
+		3C977660263BD0FC00C9C43E /* QDIPadMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3C97765E263BD0FC00C9C43E /* QDIPadMainViewController.xib */; };
+		3C977665263BD1BE00C9C43E /* QDSceneHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C977664263BD1BE00C9C43E /* QDSceneHelper.m */; };
 		4CD323992109B362007033C9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CD323972109B362007033C9 /* Localizable.strings */; };
 		CD0C342221E5E25200B781AD /* QDDynamicHeightTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CD0C342121E5E25200B781AD /* QDDynamicHeightTableViewCell.m */; };
 		CD0C342521E5E2D800B781AD /* QDCellHeightCacheViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CD0C342421E5E2D800B781AD /* QDCellHeightCacheViewController.m */; };
@@ -235,6 +241,17 @@
 		1679E3301DFFC4610072B8A1 /* QDCustomToastContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QDCustomToastContentView.m; sourceTree = "<group>"; };
 		16F42C111B1C60A70038B28F /* image0@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "image0@2x.png"; sourceTree = "<group>"; };
 		3C97760A263BB79700C9C43E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3C97764C263BCDAB00C9C43E /* QDIPhoneSceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QDIPhoneSceneDelegate.h; sourceTree = "<group>"; };
+		3C97764D263BCDAB00C9C43E /* QDIPhoneSceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QDIPhoneSceneDelegate.m; sourceTree = "<group>"; };
+		3C977652263BCDC000C9C43E /* QDIPadSceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QDIPadSceneDelegate.h; sourceTree = "<group>"; };
+		3C977653263BCDC000C9C43E /* QDIPadSceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QDIPadSceneDelegate.m; sourceTree = "<group>"; };
+		3C977657263BCE5A00C9C43E /* QDLaunchHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QDLaunchHelper.h; sourceTree = "<group>"; };
+		3C977658263BCE5A00C9C43E /* QDLaunchHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QDLaunchHelper.m; sourceTree = "<group>"; };
+		3C97765C263BD0FC00C9C43E /* QDIPadMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QDIPadMainViewController.h; sourceTree = "<group>"; };
+		3C97765D263BD0FC00C9C43E /* QDIPadMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QDIPadMainViewController.m; sourceTree = "<group>"; };
+		3C97765E263BD0FC00C9C43E /* QDIPadMainViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QDIPadMainViewController.xib; sourceTree = "<group>"; };
+		3C977663263BD1BE00C9C43E /* QDSceneHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QDSceneHelper.h; sourceTree = "<group>"; };
+		3C977664263BD1BE00C9C43E /* QDSceneHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QDSceneHelper.m; sourceTree = "<group>"; };
 		4CD323892109A55E007033C9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4CD3238A2109A564007033C9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		4CD323982109B362007033C9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -539,6 +556,14 @@
 			children = (
 				165F42F71ADB60180057EF6A /* AppDelegate.h */,
 				165F42F81ADB60180057EF6A /* AppDelegate.m */,
+				3C97764C263BCDAB00C9C43E /* QDIPhoneSceneDelegate.h */,
+				3C97764D263BCDAB00C9C43E /* QDIPhoneSceneDelegate.m */,
+				3C977652263BCDC000C9C43E /* QDIPadSceneDelegate.h */,
+				3C977653263BCDC000C9C43E /* QDIPadSceneDelegate.m */,
+				3C977657263BCE5A00C9C43E /* QDLaunchHelper.h */,
+				3C977658263BCE5A00C9C43E /* QDLaunchHelper.m */,
+				3C977663263BD1BE00C9C43E /* QDSceneHelper.h */,
+				3C977664263BD1BE00C9C43E /* QDSceneHelper.m */,
 				165F43001ADB60180057EF6A /* Images.xcassets */,
 				4CD323972109B362007033C9 /* Localizable.strings */,
 				165F43021ADB60180057EF6A /* LaunchScreen.xib */,
@@ -669,6 +694,9 @@
 				CDB8C9471DCC815A00769DF0 /* QDTabBarViewController.m */,
 				D004543024B6014B00F723E0 /* QDStyleSelectableTableViewController.h */,
 				D004543124B6014B00F723E0 /* QDStyleSelectableTableViewController.m */,
+				3C97765C263BD0FC00C9C43E /* QDIPadMainViewController.h */,
+				3C97765D263BD0FC00C9C43E /* QDIPadMainViewController.m */,
+				3C97765E263BD0FC00C9C43E /* QDIPadMainViewController.xib */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1103,6 +1131,7 @@
 				4CD323992109B362007033C9 /* Localizable.strings in Resources */,
 				CDD0D8221E0A88B600A38B96 /* image5@2x.png in Resources */,
 				CDD0D8211E0A88B600A38B96 /* image4@2x.png in Resources */,
+				3C977660263BD0FC00C9C43E /* QDIPadMainViewController.xib in Resources */,
 				16F42C121B1C60A70038B28F /* image0@2x.png in Resources */,
 				CD4EA4B42275D58400A55066 /* animatedImage.gif in Resources */,
 				165F43011ADB60180057EF6A /* Images.xcassets in Resources */,
@@ -1167,9 +1196,12 @@
 				1679E3311DFFC4610072B8A1 /* QDCustomToastContentView.m in Sources */,
 				CD4013061EFCFA300022FE2A /* QDOrientationViewController.m in Sources */,
 				CDB8C9EB1DCC815A00769DF0 /* QDSaveImageToSpecifiedAlbumViewController.m in Sources */,
+				3C977659263BCE5A00C9C43E /* QDLaunchHelper.m in Sources */,
 				CDB8C9D01DCC815A00769DF0 /* QMUIConfigurationTemplate.m in Sources */,
 				CDB8C9F91DCC815A00769DF0 /* QDAllSystemFontsViewController.m in Sources */,
 				CD1A8AA11EC4012400B81693 /* QMUIConfigurationTemplateGrass.m in Sources */,
+				3C977665263BD1BE00C9C43E /* QDSceneHelper.m in Sources */,
+				3C977654263BCDC000C9C43E /* QDIPadSceneDelegate.m in Sources */,
 				D05086B724CF567A00963BCE /* QDNavigationBottomAccessoryViewController.m in Sources */,
 				CDB8C9E01DCC815A00769DF0 /* QDGridViewController.m in Sources */,
 				CDB8C9D41DCC815A00769DF0 /* QDCommonTableViewController.m in Sources */,
@@ -1186,6 +1218,7 @@
 				CDB8C9D71DCC815A00769DF0 /* QDTabBarViewController.m in Sources */,
 				D02F87F81EDBE8C300EE2CA8 /* QDFontViewController.m in Sources */,
 				CDB8C9DF1DCC815A00769DF0 /* QDEmptyViewController.m in Sources */,
+				3C97765F263BD0FC00C9C43E /* QDIPadMainViewController.m in Sources */,
 				CDB8CA101DCC815A00769DF0 /* QDSearchViewController.m in Sources */,
 				CDB8C9F71DCC815A00769DF0 /* QDReplicatorLayerViewController.m in Sources */,
 				CDB8C9DA1DCC815A00769DF0 /* UIImageEffects.m in Sources */,
@@ -1196,6 +1229,7 @@
 				D004543224B6014B00F723E0 /* QDStyleSelectableTableViewController.m in Sources */,
 				CD18BD8521871DCE00E2A4E6 /* QDNavigationBarScrollingSnapAnimatorViewController.m in Sources */,
 				D0B1856822C5016F002578CD /* QMUIConfigurationTemplateDark.m in Sources */,
+				3C97764E263BCDAB00C9C43E /* QDIPhoneSceneDelegate.m in Sources */,
 				D021DE46205E889100FFA408 /* QDCellSizeKeyCacheViewController.m in Sources */,
 				CDB8C9DC1DCC815A00769DF0 /* QDComponentsViewController.m in Sources */,
 				D00809C924C5E5AA00C50AA1 /* UINavigationBar+QMUISmoothEffect.m in Sources */,
